@@ -1,68 +1,129 @@
 <!DOCTYPE html>
-<v-app id="app">
-  <v-toolbar color="red lighten-3" dark>
-    <v-toolbar-title>Cocktail App</v-toolbar-title>
-    <v-spacer></v-spacer>
-    <v-btn flat>Register / Login</v-btn>
-  </v-toolbar>
-  <v-container style="height: 1000px; max-width: 2400px;">
-    <v-layout>
-      <v-flex xs5>
-        <h1>Search Cocktail</h1>
-        <h2>Input Cocktail Name</h2>
-        <v-text-field v-model="searchWord" v-on:keyup="abstruct" label="Input Name" style='margin-top:4px'></v-text-field>
-        <h2>Select Ingredients</h2>
-        <v-select v-model='ingredient' :items="ingredients" label="Ingredients" v-on:change="abstruct"></v-select>
-        <h2>Select Taste</h2>
-        <v-select v-model='taste' :items="tastes" label="Taste" v-on:change="abstruct"></v-select>
-      </v-flex>
-      <v-flex xs7 style='margin:10px'>
-        <v-card style="margin-top:10px" v-for="cocktail in cocktailList">
-          <v-card-title primary-title>
-            <h3 class="headline">{{ cocktail }}</h3>
-          </v-card-title>
+<v-container style="height: 1000px; max-width: 2400px;">
+  <v-layout>
+    <v-flex xs5>
+      <v-header class="pl-0">Word Search</v-header>      
+      <v-text-field v-model="searchName" v-on:keyup="abstruct" label="Input Name" style='margin-top:4px'></v-text-field>
+      <v-text-field v-model="searchWord" v-on:keyup="abstruct" label="Input Keyword" style='margin-top:4px'></v-text-field>
 
-        <v-card-text>
-          <h3>Picture</h3>
-          <h3>Taste</h3>
-          <v-layout wrap>
-            <v-flex xs3 sm3 md3 text-center>Sweetness</v-flex>
-            <v-flex xs3 sm3 md3 text-center>Sourness</v-flex>
-            <v-flex xs3 sm3 md3 text-center>Bitterness</v-flex>
-            <v-flex xs3 sm3 md3 text-center>Alcohol</v-flex>
-  　       </v-layout>
-          <h3>Ingredients</h3>
-        </v-card-text>
+      <v-header class="pl-0">Ingredients Search</v-header>
+      <v-select v-model='baseToSearch' :items="baseList" label="Select Base" v-on:change="abstruct"></v-select>
+      <v-autocomplete
+        v-model="ingredientsToSearch"
+        :items="ingredientList"
+        filled
+        chips
+        color="blue-grey lighten-2"
+        label="Select Ingredients"
+        item-text="name"
+        item-value="name"
+        multiple
+      >
+        <template v-slot:selection="data">
+          <v-chip
+            v-bind="data.attrs"
+            :input-value="data.selected"
+            close
+            @click="data.select"
+            @click:close="remove(data.item)"
+          >
+            <v-avatar left>
+              <v-img :src="data.item.avatar"></v-img>
+            </v-avatar>
+            {{ data.item.name }}
+          </v-chip>
+        </template>
+        <template v-slot:item="data">
+          <template v-if="typeof data.item !== 'object'">
+            <v-list-item-content v-text="data.item"></v-list-item-content>
+          </template>
+          <template v-else>
+            <v-list-item-avatar>
+              <img :src="data.item.avatar">
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title v-html="data.item.name"></v-list-item-title>
+              <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle>
+            </v-list-item-content>
+          </template>
+        </template>
+      </v-autocomplete>
+      <v-header class="pl-0">Taste Search</v-header>
+      <v-subheader class="pl-0">Alcohol</v-subheader>
+      <v-range-slider
+        v-model="alcoholToSearch"
+        v-on:change="abstruct"
+        :max="50"
+        :min="0"
+        step="1"
+        ticks
+        :thumb-size="24"
+        thumb-label="always"
+      ></v-range-slider>
+      <v-subheader class="pl-0">Sourness</v-subheader>
+      <v-range-slider
+        v-model="sournessToSearch"
+        v-on:change="abstruct"
+        :max="5"
+        :min="0"
+        step="1"
+        ticks
+        :thumb-size="24"
+        thumb-label="always"
+      ></v-range-slider>
+      <v-subheader class="pl-0">Sweetness</v-subheader>
+      <v-range-slider
+        v-model="sweetnessToSearch"
+        v-on:change="abstruct"
+        :max="5"
+        :min="0"
+        step="1"
+        ticks
+        :thumb-size="24"
+        thumb-label="always"
+      ></v-range-slider>
+      <v-subheader class="pl-0">Bitterness</v-subheader>
+      <v-range-slider
+        v-model="bitternessToSearch"
+        v-on:change="abstruct"
+        :max="5"
+        :min="0"
+        step="1"
+        ticks
+        :thumb-size="24"
+        thumb-label="always"
+      ></v-range-slider>
+    </v-flex>
+    <v-flex xs7 style='margin:10px'>
+      <v-card style="margin-top:10px" v-for="cocktail in cocktailList">
+        <v-card-title primary-title>
+          <h3 class="headline">{{ cocktail.name }}</h3>
+        </v-card-title>
 
-        <v-divider></v-divider>
-  
-          <v-card-actions>
-            <v-btn class="ma-2" color="red lighten-2" dark>Detail</v-btn>
-            <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon color="red">mdi-heart</v-icon>
-            </v-btn>
-            <v-btn class="ma-2" color="primary" dark>Drink</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-flex>
-    </v-layout>
-</v-app>
-<script>
-  new Vue({
-    el: '#app',
-    data () {
-      return {
-        cocktailList: ['PinkLady', 'Mojito']
-      }
-    },
-    mounted () {
+      <v-card-text>
+        <h3>Picture</h3>
+        <h3>Taste</h3>
+        <v-layout wrap>
+          <v-flex xs3 sm3 md3 text-center>Sweetness {{ cocktail.sweetness }}</v-flex>
+          <v-flex xs3 sm3 md3 text-center>Sourness {{ cocktail.sourness }}</v-flex>
+          <v-flex xs3 sm3 md3 text-center>Bitterness {{ cocktail.bitterness }}</v-flex>
+          <v-flex xs3 sm3 md3 text-center>Alcohol {{ cocktail.alcohol }}</v-flex>
+　       </v-layout>
+        <h3>Ingredients</h3>
+        <h3 v-for="cocktail_ingredient in cocktail.cocktail_ingredients">{{cocktail_ingredient.ingredient.name}}</h3>
+      </v-card-text>
 
-    },
-    methods: {
+      <v-divider></v-divider>
 
-    }
-  });
-</script>
-
-<%= javascript_pack_tag 'cocktail' %>
+        <v-card-actions>
+          <v-btn class="ma-2" color="red lighten-2" dark>Detail</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn icon>
+            <v-icon color="red">mdi-heart</v-icon>
+          </v-btn>
+          <v-btn class="ma-2" color="primary" dark>Drink</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
+</v-container>

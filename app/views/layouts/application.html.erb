@@ -16,6 +16,14 @@
   </head>
 
   <body>
-    <%= yield %>
+    <v-app id="app">
+      <v-toolbar color="red lighten-3" dark>
+        <v-toolbar-title>Cocktail App</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn flat>Register / Login</v-btn>
+      </v-toolbar>
+      <%= yield %>
+    </v-app>
+    <%= javascript_pack_tag 'main' %>
   </body>
 </html>
