@@ -7,6 +7,9 @@ var app = new Vue({
   router,
   data () {
     return {
+      registerShown: false,
+      loginShown: false,
+      showPassword : false,
       searchShown: false,
       mypageShown: false,
       data: [],
@@ -28,6 +31,14 @@ var app = new Vue({
     this.getCocktailList();
   },
   methods: {
+    toggleRegisterModal: function(){
+      this.registerShown = !this.registerShown;
+      this.loginShown = false;
+    },
+    toggleLoginModal: function(){
+      this.loginShown = !this.loginShown;
+      this.registerShown = false;
+    },
     getCocktailList: function() {
       axios.get('/api/cocktails')
         .then(response => (
