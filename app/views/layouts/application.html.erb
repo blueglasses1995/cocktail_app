@@ -17,11 +17,44 @@
 
   <body>
     <v-app id="app">
-      <v-toolbar color="red lighten-3" dark>
+      <v-toolbar color="red lighten-3" dark fixed>
         <v-toolbar-title>Cocktail App</v-toolbar-title>
         <v-spacer></v-spacer>
+        <v-btn
+          flat
+          @click.stop="searchShown = !searchShown"
+        >Search</v-btn>
         <v-btn flat>Register / Login</v-btn>
+        <v-btn
+          flat
+          @click.stop="mypageShown = !mypageShown"
+        >Mypage</v-btn>
       </v-toolbar>
+      <h1 style="margin-bottom:2em;"></h1>
+      <v-navigation-drawer
+        v-model="mypageShown"
+        temporary
+        :right="right"
+        absolute
+        dark
+      >
+        <v-list
+          dense
+          nav
+          class="py-0"
+        >
+          <v-list-item two-line :class="miniVariant && 'px-0'">
+            <v-list-item-avatar>
+              <img src="https://randomuser.me/api/portraits/men/81.jpg">
+            </v-list-item-avatar>
+    
+            <v-list-item-content>
+              <v-list-item-title>Application</v-list-item-title>
+              <v-list-item-subtitle>Subtext</v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-navigation-drawer>
       <%= yield %>
     </v-app>
     <%= javascript_pack_tag 'main' %>

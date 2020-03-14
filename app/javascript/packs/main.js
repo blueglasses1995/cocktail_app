@@ -7,13 +7,16 @@ var app = new Vue({
   router,
   data () {
     return {
+      searchShown: false,
+      mypageShown: false,
+      data: [],
       allCocktailsData: [],
       cocktailList: [],
       ingredientList: [],
       baseList: ['ALL', 'Tequila', 'Wodka', 'Rum', 'Whiskey'],
       searchName: '',
       searchWord: '',
-      baseToSearch: '',
+      baseToSearch: 'ALL',
       ingredientsToSearch: [],
       alcoholToSearch: [0, 50],
       sournessToSearch: [0, 5],
@@ -43,13 +46,23 @@ var app = new Vue({
     abstruct: function() {
       this.cocktailList = []
       for (var i=0;i<this.allCocktailsData.length;i++) {
-        if (this.allCocktailsData[i].name.indexOf(this.searchName) !== -1) {
-          if ((this.allCocktailsData[i].name.indexOf(this.searchWord) !== -1) || (this.allCocktailsData[i].description.indexOf(this.searchWord) !== -1)) {
-            if ((this.allCocktailsData[i].alcohol >= this.alcoholToSearch[0]) && (this.allCocktailsData[i].alcohol <= this.alcoholToSearch[1])) {
-              if ((this.allCocktailsData[i].sourness >= this.sournessToSearch[0]) && (this.allCocktailsData[i].sourness <= this.sournessToSearch[1])) {
-                if ((this.allCocktailsData[i].sweetness >= this.sweetnessToSearch[0]) && (this.allCocktailsData[i].sweetness <= this.sweetnessToSearch[1])) {
-                  if ((this.allCocktailsData[i].bitterness >= this.bitternessToSearch[0]) && (this.allCocktailsData[i].bitterness <= this.bitternessToSearch[1])) {
-                    this.cocktailList.push(this.allCocktailsData[i]);
+        if (this.allCocktailsData[i]["info"].name.indexOf(this.searchName) !== -1) {
+          if ((this.allCocktailsData[i]["info"].name.indexOf(this.searchWord) !== -1) || (this.allCocktailsData[i]["info"].description.indexOf(this.searchWord) !== -1)) {
+            if ((this.allCocktailsData[i]["info"].alcohol >= this.alcoholToSearch[0]) && (this.allCocktailsData[i]["info"].alcohol <= this.alcoholToSearch[1])) {
+              if ((this.allCocktailsData[i]["info"].sourness >= this.sournessToSearch[0]) && (this.allCocktailsData[i]["info"].sourness <= this.sournessToSearch[1])) {
+                if ((this.allCocktailsData[i]["info"].sweetness >= this.sweetnessToSearch[0]) && (this.allCocktailsData[i]["info"].sweetness <= this.sweetnessToSearch[1])) {
+                  if ((this.allCocktailsData[i]["info"].bitterness >= this.bitternessToSearch[0]) && (this.allCocktailsData[i]["info"].bitterness <= this.bitternessToSearch[1])) {
+                    if ((this.baseToSearch == 'ALL') || (this.allCocktailsData[i]["ingredients"].indexOf(this.baseToSearch) >= 0)) {
+                      var num = 0;
+                      for (var n=0; n<this.ingredientsToSearch.length; n++) {
+                        if (this.allCocktailsData[i]["ingredients"].indexOf(this.ingredientsToSearch[n]) >= 0) {
+                          num += 1
+                        }
+                      }
+                      if (this.ingredientsToSearch.length == num) {
+                        this.cocktailList.push(this.allCocktailsData[i]);
+                      }
+                    }
                   }
                 }
               }
