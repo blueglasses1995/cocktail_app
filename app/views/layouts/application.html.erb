@@ -24,13 +24,24 @@
           flat
           @click.stop="searchShown = !searchShown"
         >Search</v-btn>
+        <v-switch
+          v-model="isChartMode"
+          label="ChartMode"
+        ></v-switch>
+        <!--
         <v-btn flat>Register / Login</v-btn>
         <v-btn
           flat
           @click.stop="mypageShown = !mypageShown"
         >Mypage</v-btn>
+        -->
+        <v-btn
+          flat
+          @click.stop="selectedShown = !selectedShown"
+        >Favorite</v-btn>
       </v-toolbar>
       <h1 style="margin-bottom:2em;"></h1>
+      <!--
       <v-navigation-drawer
         v-model="mypageShown"
         temporary
@@ -55,6 +66,52 @@
           </v-list-item>
         </v-list>
       </v-navigation-drawer>
+      -->
+      <v-navigation-drawer
+        v-model="selectedShown"
+        temporary
+        :right="right"
+        absolute
+        dark
+      >
+        <v-card style="margin:10px" v-for="cocktail in selectedCocktails" :key="cocktail.id" :key="cocktail.id">
+          <v-card-title primary-title><h2>{{ cocktail["info"].name }}</h2></v-card-title>
+          <v-spacer></v-spacer>
+          <v-btn @click="showDetail(cocktail)" class="ma-2" color="red lighten-2" dark>Detail</v-btn>
+        </v-card>
+      </v-navigation-drawer>
+      
+      <v-dialog v-model="detailShown" width="800">
+        <v-card>
+          <v-card-title class="headline red lighten-3 white--text" primary-title>
+            {{ detailedCocktail["info"].name }}
+          </v-card-title>
+
+          <v-card-text>
+            <h3>{{ detailedCocktail["info"].description }}</h3>
+            <h3>Taste</h3>
+            <v-layout wrap>
+              <v-flex xs3 sm3 md3 text-center>Alcohol {{ detailedCocktail["info"].alcohol }}</v-flex>
+              <v-flex xs3 sm3 md3 text-center>Sourness {{ detailedCocktail["info"].sourness }}</v-flex>
+              <v-flex xs3 sm3 md3 text-center>Sweetness {{ detailedCocktail["info"].sweetness }}</v-flex>
+              <v-flex xs3 sm3 md3 text-center>Bitterness {{ detailedCocktail["info"].bitterness }}</v-flex>
+    　       </v-layout>
+    　       <h3>Ingredients</h3>
+            <v-list dense>
+              <v-list-tile v-for="ing in detailedCocktail['ingredientsAmount']">
+                <v-list-tile-content>{{ ing.name }}:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ ing.amount }} ml</v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-card-text>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn class="ma-2" color="red" dark @click="detailShown=false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      
       <%= yield %>
     </v-app>
     <%= javascript_pack_tag 'main' %>

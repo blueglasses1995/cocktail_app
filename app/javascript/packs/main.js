@@ -7,8 +7,28 @@ var app = new Vue({
   router,
   data () {
     return {
+      isChartMode: false,
+      headers: [
+          {
+            text: 'Cocktails',
+            align: 'left',
+            sortable: false,
+            value: 'name'
+          },
+          { text: 'Alcohol', value: 'alcohol' },
+          { text: 'Sourness', value: 'sourness' },
+          { text: 'Sweetness', value: 'sweetness' },
+          { text: 'Bitterness', value: 'bitterness' }
+        ],
       searchShown: false,
       mypageShown: false,
+      selectedShown: false,
+      detailShown: false,
+      detailedCocktail: 0,
+      pagination: {
+        sortBy: 'name'
+      },
+      selectedCocktails: [],
       data: [],
       allCocktailsData: [],
       cocktailList: [],
@@ -33,7 +53,8 @@ var app = new Vue({
         .then(response => (
           this.allCocktailsData = response.data.cocktails,
           this.cocktailList = response.data.cocktails,
-          this.ingredientList = response.data.ingredients
+          this.ingredientList = response.data.ingredients,
+          this.detailedCocktail = response.data.cocktails[0]
           //this.abstruct()
         )
       )
@@ -42,6 +63,33 @@ var app = new Vue({
         //  this.baseList[this.baseList.length] = this.ingredientList[i];  
         //};
       //};
+    },
+    toggleAll () {
+      if (this.selectedCocktails.length) this.selected = []
+      else this.selectedCocktails = this.cocktailList.slice()
+    },
+    changeSort (column) {
+      if (this.pagination.sortBy === column) {
+        this.pagination.descending = !this.pagination.descending
+      } else {
+        this.pagination.sortBy = column
+        this.pagination.descending = false
+      }
+    },
+    selectCocktail (cocktail) {
+      var num = 0;
+      for (var i=0;i<this.selectedCocktails.length;i++) {
+        if (this.selectedCocktails[i]["info"].name != cocktail["info"].name) {
+          num++;
+        }
+      }
+      if (this.selectedCocktails.length == num) {
+        this.selectedCocktails.push(cocktail);
+      }
+    },
+    showDetail (cocktail) {
+      this.detailShown = true;
+      this.detailedCocktail = cocktail;
     },
     abstruct: function() {
       this.cocktailList = []

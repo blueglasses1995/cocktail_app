@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <v-container style="height: 1000px; max-width: 2400px;">
-  <v-layout>
     <v-bottom-sheet v-model="searchShown">
       <v-btn class="ma-2" color="red lighten-2" dark
           @click="searchShown = !searchShown"
@@ -104,39 +103,113 @@
         </v-container>        
       </v-sheet>
     </v-bottom-sheet>
-    <v-flex xs6 style='margin:10px'>
-      <v-card style="margin:10px" v-for="cocktail in cocktailList" :key="cocktail">
-        <v-img
-          class="white--text align-end"
-          height="200px"
-          src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+    
+    <template v-if="!isChartMode">
+      <v-layout wrap>
+        <v-flex xs4 sm4 md4>
+          <v-card style="margin:10px" v-for="cocktail in cocktailList" :key="cocktail.id">
+            <v-img
+              class="white--text align-end"
+              height="200px"
+              src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+            >
+              <v-card-title primary-title><h2>{{ cocktail["info"].name }}</h2></v-card-title>
+            </v-img>
+    
+            <v-card-text>
+              <h3>{{ cocktail["info"].description }}</h3>
+              <h3>Taste</h3>
+              <v-layout wrap>
+                <v-flex xs3 sm3 md3 text-center>Alcohol {{ cocktail["info"].alcohol }}</v-flex>
+                <v-flex xs3 sm3 md3 text-center>Sourness {{ cocktail["info"].sourness }}</v-flex>
+                <v-flex xs3 sm3 md3 text-center>Sweetness {{ cocktail["info"].sweetness }}</v-flex>
+                <v-flex xs3 sm3 md3 text-center>Bitterness {{ cocktail["info"].bitterness }}</v-flex>
+      　       </v-layout>
+      　       <h3>Ingredients</h3>
+              <v-list dense>
+                <v-list-tile v-for="ing in cocktail['ingredientsAmount']">
+                  <v-list-tile-content>{{ ing.name }}:</v-list-tile-content>
+                  <v-list-tile-content class="align-end">{{ ing.amount }}ml</v-list-tile-content>
+                </v-list-tile>
+              </v-list>
+            </v-card-text>
+    
+            <v-divider></v-divider>
+    
+            <v-card-actions>
+              <!--
+              <v-btn class="ma-2" color="red lighten-2" dark>Detail</v-btn>
+              -->
+              <v-spacer></v-spacer>
+              <v-btn icon>
+                <v-icon color="red" @click="selectCocktail(cocktail)">mdi-heart</v-icon>
+              </v-btn>
+              <!--
+              <v-btn class="ma-2" color="primary" dark>Drink</v-btn>
+              -->
+            </v-card-actions>
+            
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </template>
+      
+    <template v-if="isChartMode">
+      <v-card>
+        <v-card-title>
+          Cocktails Chart
+        </v-card-title>
+        <v-data-table
+          v-model="selectedCocktails"
+          :headers="headers"
+          :items="cocktailList"
+          :search="search"
+          :pagination.sync="pagination"
+          item-key="name"
+          hide-actions
+          class="elevation-1"
         >
-          <v-card-title primary-title><h2>{{ cocktail["info"].name }}</h2></v-card-title>
-        </v-img>
-
-        <v-card-text>
-          <h3>Taste</h3>
-          <v-layout wrap>
-            <v-flex xs3 sm3 md3 text-center>Sweetness {{ cocktail["info"].sweetness }}</v-flex>
-            <v-flex xs3 sm3 md3 text-center>Sourness {{ cocktail["info"].sourness }}</v-flex>
-            <v-flex xs3 sm3 md3 text-center>Bitterness {{ cocktail["info"].bitterness }}</v-flex>
-            <v-flex xs3 sm3 md3 text-center>Alcohol {{ cocktail["info"].alcohol }}</v-flex>
-  　       </v-layout>
-          <h3>Ingredients</h3>
-          <h3 v-for="ing in cocktail['ingredientsAmount']" :key="ing">{{ing.name}}: {{ing.amount}}ml</h3>
-        </v-card-text>
-
-        <v-divider></v-divider>
-
-        <v-card-actions>
-          <v-btn class="ma-2" color="red lighten-2" dark>Detail</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn icon>
-            <v-icon color="red">mdi-heart</v-icon>
-          </v-btn>
-          <v-btn class="ma-2" color="primary" dark>Drink</v-btn>
-        </v-card-actions>
+          <template slot="headers" slot-scope="props">
+            <tr>
+              <th
+                v-for="header in props.headers"
+                :key="header.text"
+                :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
+                @click="changeSort(header.value)"
+              >
+                <v-icon small>arrow_upward</v-icon>
+                {{ header.text }}
+              </th>
+              <th>Drink</th>
+            </tr>
+          </template>
+          <template slot="items" slot-scope="props">
+            <tr @click="props.expanded = !props.expanded">
+              <th class="text-xs-left">{{ props.item['info'].name }}</th>
+              <td class="text-xs-right">{{ props.item['info'].alcohol }}</td>
+              <td class="text-xs-right">{{ props.item['info'].sourness }}</td>
+              <td class="text-xs-right">{{ props.item['info'].sweetness }}</td>
+              <td class="text-xs-right">{{ props.item['info'].bitterness }}</td>
+              <td class="text-xs-center">
+                <v-btn icon>
+                  <v-icon color="red" @click="selectCocktail(props.item)">mdi-heart</v-icon>
+                </v-btn>
+              </td>
+            </tr>
+          </template>
+          <template slot="expand" slot-scope="props">
+            <v-card flat>
+              <v-card-text>
+                <v-list dense>
+                  <v-list-tile v-for="ing in cocktail['ingredientsAmount']">
+                    <v-list-tile-content>{{ ing.name }}:</v-list-tile-content>
+                    <v-list-tile-content class="align-end">{{ ing.amount }} ml</v-list-tile-content>
+                  </v-list-tile>
+                </v-list>
+              </v-card-text>
+            </v-card>
+          </template>
+        </v-data-table>
       </v-card>
-    </v-flex>
-  </v-layout>
+    </template>
 </v-container>
